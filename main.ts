@@ -183,7 +183,7 @@ namespace PI {
 
     /***************************************************Power Up******************************************/
 
-    //% blockId=followLine  block="follow line set to %boo with speed %speed and turning speed %tspeed|leftPin %lpin rightPin %rpin"
+    //% blockId=followLine  block="FollowLine set %boo |Speed set %speed |TurningSpeed set %tspeed |leftPin %lpin |rightPin %rpin"
     //% subcategory=PowerUp weight=100
     //% speed.min=0 speed.max=100
     export function followLine(boo: Boo, speed: number, tspeed: number, lpin: DigitalPin, rpin: DigitalPin): void {
@@ -199,7 +199,7 @@ namespace PI {
         }
     }
 
-    //% blockId=autoGrab  block="autoGrab servo pin %pin type %servoType|trig %trig echo %echo"
+    //% blockId=autoGrab  block="AutoGrab servo pin %pin |ServoType %servoType |trig %trig |echo %echo"
     //% subcategory=PowerUp weight=95
     export function autoGrab(servoType: ServoTypeList, pin: ServoList, trig: DigitalPin, echo: DigitalPin, temp = 0) {
         temp = ultrasonic(trig, echo)
