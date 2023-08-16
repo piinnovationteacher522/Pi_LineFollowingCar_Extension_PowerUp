@@ -1,21 +1,43 @@
+enum Distance_Unit {
+    //% block="mm" enumval=0
+    Distance_Unit_mm,
+
+    //% block="cm" enumval=1
+    Distance_Unit_cm,
+
+    //% block="inch" enumval=2
+    Distance_Unit_inch,
+}
+
 //% color=#fd00fd  icon="\uf1b9" block="PI" blockId="PI"
 namespace PI {
     const board_address = 0x10
 
+    export enum LightMode {
+        //% block="BREATH"
+        BREATH,
+        //% block="OFF"
+        OFF
+    }
+
     export enum Boo {
         //% block="True"
         T,
-        //% block="False"
+        //% block="False
         F
     }
-
+    /**
+    * MotorList
+    */
     export enum MotorList {
         //% block="M1"
         M1,
         //% block="M2"
         M2
     }
-
+    /**
+    * ServoList
+    */
     export enum ServoList {
         //% block="S0" enumval=0
         S0,
@@ -34,7 +56,9 @@ namespace PI {
         //% block="S7" enumval=7
         S7
     }
-
+    /**
+    * ServoTypeList
+    */
     export enum ServoTypeList {
         //% block="180°" 
         _180,
@@ -87,6 +111,19 @@ namespace PI {
     }
 
     //% weight=88
+    //% blockId=stopMotor block="Stop motor %motor"
+    export function stopMotor(motor: MotorList): void {
+        setMotorSpeed(motor, 0)
+    }
+
+    //% weight=87
+    //% blockId=stopAllMotor  block="Stop all motor"
+    export function stopAllMotor(): void {
+        setMotorSpeed(MotorList.M1, 0)
+        setMotorSpeed(MotorList.M2, 0)
+    }
+
+    //% weight=86
     //% blockId=turnLeft  block="turn left with speed %speed"
     //% speed.min=-100 speed.max=100
     export function turnLeft(speed: number): void {
@@ -94,7 +131,7 @@ namespace PI {
         setMotorSpeed(MotorList.M2, speed)
     }
 
-    //% weight=87
+    //% weight=85
     //% blockId=turnRight  block="turn right with speed %speed"
     //% speed.min=-100 speed.max=100
     export function turnRight(speed: number): void {
@@ -102,7 +139,7 @@ namespace PI {
         setMotorSpeed(MotorList.M2, 0)
     }
 
-    //% weight=86
+    //% weight=84
     //% blockId=goForward  block="go forward with speed %speed"
     //% speed.min=-100 speed.max=100
     export function goForward(speed: number): void {
@@ -110,7 +147,7 @@ namespace PI {
         setMotorSpeed(MotorList.M2, speed)
     }
 
-    //% weight=85
+    //% weight=83
     //% blockId=goBack  block="go Backward with speed %speed"
     //% speed.min=-100 speed.max=100
     export function goBackward(speed: number): void {
@@ -118,25 +155,26 @@ namespace PI {
         setMotorSpeed(MotorList.M2, -speed)
     }
 
-    //% weight=84
-    //% blockId=followLine  block="FollowLine set %boo|Speed set %speed|TurningSpeed set %tspeed|leftPin %lpin|rightPin %rpin"
+    //% weight=82
+    //% blockId=followLine  block="follow line with speed %speed left pin %lpin right pin %rpin"
     //% speed.min=0 speed.max=100
-    export function followLine(boo: Boo, speed: number, tspeed: number, lpin: DigitalPin, rpin: DigitalPin): void {
+    export function followLine(boo: Boo, speed: number, lpin: DigitalPin, rpin: DigitalPin): void {
         if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 0) {
             goForward(speed)
         } else if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 1) {
-            turnRight(tspeed)
+            turnRight(speed)
         } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 0) {
-            turnLeft(tspeed)
+            turnLeft(speed)
         } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 1) {
-            setMotorSpeed(MotorList.M1, -tspeed)
-            setMotorSpeed(MotorList.M2, tspeed)
+            setMotorSpeed(MotorList.M1, -speed)
+            setMotorSpeed(MotorList.M2, speed)
         }
     }
 
-    //% weight=83
-    //% blockId=ultrasonic block="ultrasonic sensor trig %trig echo %echo"
-    export function ultrasonic(trig: DigitalPin, echo: DigitalPin, maxCmDistance = 20): number {
+    //% weight=81
+    //% blockId=sonar_ping block="ping trig %trig|echo %echo"
+    export function ping(trig: DigitalPin, echo: DigitalPin, maxCmDistance = 20): number {
+        // send pulse
         pins.setPull(trig, PinPullMode.PullNone);
         pins.digitalWritePin(trig, 0);
         control.waitMicros(2);
@@ -144,12 +182,13 @@ namespace PI {
         control.waitMicros(10);
         pins.digitalWritePin(trig, 0);
 
+        // read pulse
         const d = pins.pulseIn(echo, PulseValue.High, maxCmDistance * 58);
 
         return Math.idiv(d, 58);
     }
 
-    //% weight=82
+    //% weight=80
     //% blockId=setServoAngle block="Set %servoType servo %servo angle to %angle"
     //% angle.min=0 angle.max=360
     export function setServoAngle(servoType: ServoTypeList, servo: ServoList, angle: number): void {
