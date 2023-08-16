@@ -118,6 +118,22 @@ namespace PI {
         setMotorSpeed(MotorList.M2, -speed)
     }
 
+    //% weight=84
+    //% blockId=followLine  block="FollowLine set %boo|Speed set %speed|TurningSpeed set %tspeed|leftPin %lpin|rightPin %rpin"
+    //% speed.min=0 speed.max=100
+    export function followLine(boo: Boo, speed: number, tspeed: number, lpin: DigitalPin, rpin: DigitalPin): void {
+        if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 0) {
+            goForward(speed)
+        } else if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 1) {
+            turnRight(tspeed)
+        } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 0) {
+            turnLeft(tspeed)
+        } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 1) {
+            setMotorSpeed(MotorList.M1, -tspeed)
+            setMotorSpeed(MotorList.M2, tspeed)
+        }
+    }
+
     //% weight=83
     //% blockId=ultrasonic block="ultrasonic sensor trig %trig echo %echo"
     export function ultrasonic(trig: DigitalPin, echo: DigitalPin, maxCmDistance = 20): number {
@@ -179,32 +195,5 @@ namespace PI {
         buf[2] = 0;
         buf[3] = 0;
         pins.i2cWriteBuffer(board_address, buf);
-    }
-
-    /***************************************************Power Up******************************************/
-
-    //% blockId=followLine  block="FollowLine set %boo |Speed set %speed |TurningSpeed set %tspeed |leftPin %lpin |rightPin %rpin"
-    //% subcategory=PowerUp weight=100
-    //% speed.min=0 speed.max=100
-    export function followLine(boo: Boo, speed: number, tspeed: number, lpin: DigitalPin, rpin: DigitalPin): void {
-        if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 0) {
-            goForward(speed)
-        } else if (pins.digitalReadPin(lpin) == 0 && pins.digitalReadPin(rpin) == 1) {
-            turnRight(tspeed)
-        } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 0) {
-            turnLeft(tspeed)
-        } else if (pins.digitalReadPin(lpin) == 1 && pins.digitalReadPin(rpin) == 1) {
-            setMotorSpeed(MotorList.M1, -tspeed)
-            setMotorSpeed(MotorList.M2, tspeed)
-        }
-    }
-
-    //% blockId=autoGrab  block="AutoGrab servo pin %pin |ServoType %servoType |trig %trig |echo %echo"
-    //% subcategory=PowerUp weight=95
-    export function autoGrab(servoType: ServoTypeList, pin: ServoList, trig: DigitalPin, echo: DigitalPin, temp = 0) {
-        temp = ultrasonic(trig, echo)
-        if (temp <= 2 && temp != 0) {
-            setServoAngle(servoType, pin, 30)
-        }
     }
 }
